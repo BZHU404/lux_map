@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>宝谱 · 角色戴的这颗石头，是什么来头？</title>
+<meta name="description" content="宝谱：宝石、玉石、矿石晶体、有机宝石与贵金属的创作向资料库。莫氏硬度尺、颜色反查、处理方式标注、保养与毒性提示。">
+<meta name="theme-color" content="#F7F2E9">
+<link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="brand/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="brand/app-icon-180.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="masthead">
+  <div class="wrap masthead__row">
+    <div class="brand">
+      <h1 class="brand__cn">宝谱</h1>
+      <p class="brand__en">BAOPU<span>·</span>A CABINET OF STONES</p>
+    </div>
+    <p class="masthead__tag">角色戴的这颗石头，<br>是什么来头？</p>
+  </div>
+</header>
+
+<div class="toolbar" id="toolbar">
+  <div class="wrap toolbar__row">
+    <nav class="tabs" aria-label="藏品类别">
+      <a class="tab is-on" href="#/gems" data-view="gems">宝石<sup id="tabGems">14</sup></a>
+      <a class="tab" href="#/metals" data-view="metals">金属<sup id="tabMetals">4</sup></a>
+      <a class="tab" href="#/ledger" data-view="ledger">名录<sup id="tabTotal">18</sup></a>
+      <a class="tab" href="#/cuts" data-view="cuts">切工<sup id="tabCuts">100</sup></a>
+      <a class="tab" href="#/habits" data-view="habits">晶形<sup id="tabHabits">16</sup></a>
+    </nav>
+
+    <div class="search">
+      <svg class="search__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4 4"/></svg>
+      <input id="q" type="search" inputmode="search" autocomplete="off" spellcheck="false"
+             placeholder="搜中文 · 英文 · 化学式 · 别名" aria-label="搜索宝石或金属">
+      <kbd class="search__kbd" aria-hidden="true">/</kbd>
+      <button class="search__clear" id="qClear" type="button" aria-label="清除搜索" hidden>×</button>
+    </div>
+
+    <div class="toolbar__acts">
+      <button class="btn" id="randomBtn" type="button">随机一颗</button>
+      <button class="btn btn--filter" id="filterBtn" type="button" aria-expanded="false" aria-controls="rail">筛选</button>
+    </div>
+
+    <p class="toolbar__count" id="toolbarCount" hidden></p>
+  </div>
+</div>
+
+<main id="main">
+  <section class="mohs wrap" aria-labelledby="mohsTitle">
+    <div class="sec-head">
+      <h2 id="mohsTitle">莫氏硬度尺<em>MOHS SCALE</em></h2>
+      <p class="sec-head__hint">点刻度筛选 · 点石头看详情</p>
+    </div>
+    <div class="mohs__plot" id="mohsPlot"></div>
+    <div class="mohs__axis" id="mohsAxis" role="group" aria-label="按莫氏硬度筛选"></div>
+    <p class="mohs__ref">高硬度可划伤低硬度：≥5.5 可划玻璃，≥7 可划石英。指甲 2.5 · 铜币 3.5 · 小刀 5.5 · 钢锉 6.5</p>
+  </section>
+
+  <div class="wrap layout">
+    <aside class="rail" id="rail" aria-label="筛选">
+      <div class="rail__top">
+        <h2>筛选<em>FILTER</em></h2>
+        <button class="link" id="resetBtn" type="button" hidden>全部清除</button>
+      </div>
+      <div id="railBody"></div>
+      <p class="rail__note">「处理」标注该石种在市场上常见的状态，不代表每一颗都经过处理。</p>
+    </aside>
+
+    <section class="results">
+      <div class="resultbar">
+        <p class="resultbar__count" id="resultCount"></p>
+        <label class="sortbox">排序
+          <select id="sort">
+            <option value="default">默认</option>
+            <option value="mohs-asc">硬度 低 → 高</option>
+            <option value="mohs-desc">硬度 高 → 低</option>
+            <option value="price-desc">价格 高 → 低</option>
+            <option value="price-asc">价格 低 → 高</option>
+            <option value="name">名称</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="activechips" id="activeChips"></div>
+      <div class="grid" id="grid"></div>
+
+      <div class="empty" id="empty" hidden>
+        <p class="empty__mark">◇</p>
+        <p class="empty__title">没有符合条件的石头</p>
+        <p class="empty__sub">试试减少几个筛选条件，或者换一个颜色。</p>
+        <button class="btn" id="emptyReset" type="button">清除全部筛选</button>
+      </div>
+
+      <nav class="pager" id="pager" aria-label="分页"></nav>
+    </section>
+  </div>
+
+  <section class="ledger wrap" id="ledger" hidden>
+    <header class="ledger__head">
+      <p class="ledger__eyebrow">名录<em>LEDGER · SPECIMEN INDEX</em></p>
+      <div class="ledger__top">
+        <p class="ledger__total"><b id="lgTotal">18</b><span>种</span></p>
+        <p class="ledger__break" id="lgBreak"></p>
+      </div>
+    </header>
+
+    <div class="stats" id="lgStats"></div>
+
+    <section class="lg-sec" aria-labelledby="lgConvertTitle">
+      <div class="lg-head">
+        <h2 id="lgConvertTitle">克拉与黄金</h2>
+        <p>1 克拉 = 0.2 克。重量能换算，价值不能——同样 1 克拉，钻石和玻璃差着几个数量级。</p>
+      </div>
+
+      <div class="convert">
+        <div class="convert__cell">
+          <label for="ctInput">克拉 ct</label>
+          <input id="ctInput" type="number" inputmode="decimal" min="0" step="0.01" value="1">
+        </div>
+        <div class="convert__cell convert__cell--out">
+          <div class="readout"><b id="outGram">0.20</b><span>克 g</span></div>
+          <div class="readout"><b id="outPoint">100</b><span>分 pt</span></div>
+        </div>
+        <div class="convert__cell">
+          <label for="goldInput">金价 元/克</label>
+          <input id="goldInput" type="number" inputmode="decimal" min="0" step="10" placeholder="填入当日金价">
+        </div>
+        <div class="convert__cell convert__cell--out">
+          <div class="readout readout--wide"><b id="outGold">—</b><span>等重黄金价值</span></div>
+        </div>
+      </div>
+
+      <p class="fineprint">克拉是重量，K 是黄金纯度，两者不能互换：24K = 999‰，18K = 750‰，14K = 585‰。1 克 = 5 克拉；1 金衡盎司 = 31.1035 克 ≈ 155.5 克拉。金价请填当日实际价格，这里只做等重换算，不构成报价。</p>
+    </section>
+
+    <section class="lg-sec" aria-labelledby="lgClarityTitle">
+      <div class="lg-head">
+        <h2 id="lgClarityTitle">纯净度怎么分</h2>
+        <p>钻石有国际通行的 11 级；彩色宝石没有统一标准；翡翠说的「种水」不是净度。</p>
+      </div>
+
+      <div class="clarity">
+        <article class="cl">
+          <h3>钻石 · GIA 11 级<em>DIAMOND</em></h3>
+          <table class="mini">
+            <thead><tr><th>级别</th><th>中文</th><th>说明</th></tr></thead>
+            <tbody>
+              <tr><td>FL</td><td>无瑕</td><td>10 倍放大镜下内外均无瑕</td></tr>
+              <tr><td>IF</td><td>内无瑕</td><td>内部无瑕，表面可有可抛光去除的微痕</td></tr>
+              <tr><td>VVS1</td><td>极微瑕</td><td>10 倍下极难发现</td></tr>
+              <tr><td>VVS2</td><td>极微瑕</td><td>10 倍下很难发现</td></tr>
+              <tr><td>VS1</td><td>微瑕</td><td>10 倍下可见，肉眼不可见</td></tr>
+              <tr><td>VS2</td><td>微瑕</td><td>10 倍下较易见，肉眼仍不可见</td></tr>
+              <tr><td>SI1</td><td>小瑕</td><td>10 倍下明显，肉眼通常不可见</td></tr>
+              <tr><td>SI2</td><td>小瑕</td><td>肉眼有时可见</td></tr>
+              <tr><td>I1</td><td>有瑕</td><td>肉眼可见，可能影响亮度</td></tr>
+              <tr><td>I2</td><td>有瑕</td><td>明显可见，影响亮度与耐久</td></tr>
+              <tr><td>I3</td><td>有瑕</td><td>严重内含，耐久性差</td></tr>
+            </tbody>
+          </table>
+          <p class="fineprint">国标 GB/T 16554 用 LC / VVS / VS / SI / P 对应；「肉眼干净」不等于高等级，只说明正面看不到。</p>
+        </article>
+
+        <div class="cl-stack">
+          <article class="cl">
+            <h3>彩色宝石 · 没有统一分级<em>COLORED STONES</em></h3>
+            <ul class="cl-list">
+              <li><b>肉眼干净</b>10 倍下有内含物，正面肉眼看不出——市场上最常听到的描述。</li>
+              <li><b>轻微内含</b>肉眼能隐约看到，不影响亮度。</li>
+              <li><b>明显内含</b>肉眼可见，影响透明度，价格要体现。</li>
+              <li><b>重内含</b>影响耐久，多用于弧面、雕件或标本。</li>
+            </ul>
+            <p class="fineprint">GIA 对彩宝按内含物类型分 Type I / II / III，不套用钻石的 11 级；祖母绿的「花园」是特征，不是缺陷。注油、充填会改变净度表现，必须披露。</p>
+          </article>
+
+          <article class="cl">
+            <h3>翡翠与珍珠 · 另一套语言<em>JADE &amp; PEARL</em></h3>
+            <ul class="cl-list">
+              <li><b>种水</b>玻璃种 / 冰种 / 糯种 / 豆种——按透明度与结构分，不是净度。</li>
+              <li><b>瑕疵</b>棉、石花、黑点、裂；裂最致命，直接影响耐用与价格。</li>
+              <li><b>珍珠瑕疵度</b>无瑕 / 极微瑕 / 微瑕 / 小瑕 / 中瑕 / 重瑕（GB/T 18781），另看光泽、圆度、珠层厚度。</li>
+            </ul>
+            <p class="fineprint">欧泊、绿松石没有通用净度分级，分别看变彩强弱与铁线分布。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="lg-sec" aria-labelledby="lgTableTitle">
+      <div class="lg-head">
+        <h2 id="lgTableTitle">宝石总表</h2>
+        <p>一张表看完：推荐切工、六种饰品的适配度、生辰石。点行看详情。</p>
+      </div>
+      <div class="lg-filters" id="lgFilters"></div>
+
+      <p class="fineprint lg-legend">● 推荐　○ 可戴，需注意　× 不建议贴身佩戴（依据硬度、解理、脆性与日常磨损判断）。</p>
+
+      <div class="lg-tablewrap">
+        <table class="lg-table">
+          <thead>
+            <tr>
+              <th>名称</th><th>类别</th><th>硬度</th><th>价格</th><th>推荐切工</th>
+              <th class="mj">戒指</th><th class="mj">吊坠</th><th class="mj">耳饰</th>
+              <th class="mj">手链</th><th class="mj">胸针</th><th class="mj">摆件</th>
+              <th>生辰石</th>
+            </tr>
+          </thead>
+          <tbody id="lgBody"></tbody>
+        </table>
+      </div>
+      <div class="lg-cards" id="lgCards"></div>
+    </section>
+  </section>
+
+  <section class="cuts wrap" id="cuts" hidden>
+    <header class="cuts__head">
+      <p class="ledger__eyebrow">切工<em>CUT ATLAS · 100 SHAPES</em></p>
+      <div class="cuts__row">
+        <h2 class="cuts__title">100 种宝石切工</h2>
+        <div class="cuts__side">
+          <p class="cuts__sub">常见形状与切工速查。从经典外形，到弧面、花式、配石、雕刻与特殊结构。</p>
+          <button class="link cuts__jump" type="button" data-scroll-to="settings">↓ 镶嵌工艺 16 种</button>
+        </div>
+      </div>
+    </header>
+    <div id="cutGroups"></div>
+
+    <section class="settings" id="settings" aria-labelledby="setTitle">
+      <div class="lg-head">
+        <h2 id="setTitle">镶嵌工艺 16 种</h2>
+        <p>石头怎么固定到金属上，决定了它耐不耐戴、闪不闪。</p>
+      </div>
+      <div class="settinggrid" id="settingGrid"></div>
+    </section>
+
+    <p class="fineprint">切割与镶嵌的名称在不同地区可能有不同译法，本页按常见中文称谓整理；图为示意，不代表真实比例。</p>
+  </section>
+
+  <section class="habits wrap" id="habits" hidden>
+    <header class="cuts__head">
+      <p class="ledger__eyebrow">晶形<em>CRYSTAL HABIT · 16 TYPES</em></p>
+      <div class="cuts__row">
+        <h2 class="cuts__title">晶体习性 16 种</h2>
+        <p class="cuts__sub">同一块石头长成什么样，取决于它在哪里、怎么长。写场景时，先想它是一根针，还是一串葡萄。</p>
+      </div>
+    </header>
+
+    <div class="habitgrid" id="habitGrid"></div>
+
+    <section class="systems" aria-labelledby="systemsTitle">
+      <div class="lg-head">
+        <h2 id="systemsTitle">晶系 7 种</h2>
+        <p>晶胞的三条边 a、b、c 与三个夹角 α、β、γ，决定了矿物属于哪一系。</p>
+      </div>
+      <div class="systemgrid" id="systemGrid"></div>
+    </section>
+
+    <section class="spacegroup" aria-labelledby="sgTitle">
+      <div class="lg-head">
+        <h2 id="sgTitle">空间群</h2>
+        <p>原子在三维空间里怎么重复，就有多少种对称组合。</p>
+      </div>
+      <p class="sg-intro">晶体内部原子的排列方式，用「空间群」描述：三维空间共有 230 种空间群、14 种布拉维格子、32 种点群。最基础的是立方格子的三种变体——简单立方（P）、体心立方（I）、面心立方（F），分别对应不同的原子位置。</p>
+      <div class="sggrid" id="sgGrid"></div>
+    </section>
+
+    <section class="phys" aria-labelledby="physTitle">
+      <div class="lg-head">
+        <h2 id="physTitle">解理 · 断口 · 条痕 · 磁性 · 荧光</h2>
+        <p>五个最常被写错的物理性质，以及本谱里能查到的例子。</p>
+      </div>
+
+      <div class="physgrid">
+        <article class="physcard">
+          <h3>解理<em>CLEAVAGE</em></h3>
+          <p>矿物沿特定晶面裂开的倾向。裂面平整、有方向性，可以重复出现。</p>
+          <table class="mini mini--wide">
+            <thead><tr><th>等级</th><th>代表矿物</th><th>表现</th></tr></thead>
+            <tbody>
+              <tr><td>极完全</td><td>云母</td><td>一撕一片，薄如纸</td></tr>
+              <tr><td>完全</td><td>方解石、萤石、托帕石</td><td>轻敲就沿平面裂开</td></tr>
+              <tr><td>中等</td><td>长石、辉石</td><td>可见裂面，但不主导</td></tr>
+              <tr><td>不完全</td><td>橄榄石</td><td>偶见平整裂面</td></tr>
+              <tr><td>无</td><td>石英、石榴石</td><td>只有断口</td></tr>
+            </tbody>
+          </table>
+          <p class="fineprint">本谱例子：钻石 111 面完全、托帕石 001 面完全、萤石 111 面完全、冰洲石菱面体完全。完全解理的石头怕磕，镶嵌要包边。</p>
+        </article>
+
+        <article class="physcard">
+          <h3>断口<em>FRACTURE</em></h3>
+          <p>没有解理时，矿物破裂形成的面。看「碎了以后长什么样」。</p>
+          <ul class="cl-list">
+            <li><b>贝壳状</b>弧面同心纹，像贝壳；石英、黑曜石、玻璃。</li>
+            <li><b>锯齿状</b>尖锐不平，像撕开的金属；自然铜、铁陨石。</li>
+            <li><b>参差状</b>不规则粗糙面；大多数块状矿物。</li>
+            <li><b>土状 / 纤维状</b>粉末状或纤维状断口，多见于风化或纤维状矿物。</li>
+          </ul>
+          <p class="fineprint">断口决定「碎了以后好不好看」：黑曜石的贝壳状断口能打出刀刃，铁陨石的锯齿状断口则像撕开的铁。</p>
+        </article>
+
+        <article class="physcard">
+          <h3>条痕<em>STREAK</em></h3>
+          <p>矿物在无釉瓷板上划出的粉末颜色，比块体颜色稳定，是鉴定金属矿与氧化物的老办法。</p>
+          <ul class="cl-list">
+            <li><b>辰砂</b>朱红；<b>雄黄</b>橙黄。</li>
+            <li><b>孔雀石</b>浅绿；<b>青金石</b>蓝；<b>绿松石</b>浅蓝。</li>
+            <li><b>方解石 / 萤石</b>白色。</li>
+            <li><b>铁陨石</b>灰；<b>煤精</b>褐。</li>
+          </ul>
+          <p class="fineprint">透明宝石很少用条痕鉴定；条痕对不透明矿物最有用。</p>
+        </article>
+
+        <article class="physcard">
+          <h3>磁性<em>MAGNETISM</em></h3>
+          <p>含铁、镍的矿物可能被磁铁吸引。强磁性很少见，弱磁性更常见。</p>
+          <ul class="cl-list">
+            <li><b>强磁性</b>铁陨石、橄榄陨石（铁镍基质）、磁铁矿。</li>
+            <li><b>弱磁性</b>部分石榴石、辉石。</li>
+            <li><b>检测</b>磁铁能否吸起；能吸起是强磁性，能被磁铁轻微影响是弱磁性。</li>
+          </ul>
+          <p class="fineprint">「磁铁能吸住的石头」是很好用的细节：铁陨石挂坠靠近磁铁会动。</p>
+        </article>
+
+        <article class="physcard">
+          <h3>荧光性<em>FLUORESCENCE</em></h3>
+          <p>在紫外线下发出可见光。关灯后还亮一阵的叫磷光，两者不是一回事。</p>
+          <ul class="cl-list">
+            <li><b>萤石</b>蓝紫荧光，但不是所有萤石都发光。</li>
+            <li><b>方解石 / 冰洲石</b>红或白荧光。</li>
+            <li><b>红宝石</b>铬致红色荧光；<b>部分钻石</b>蓝荧光。</li>
+            <li><b>琥珀、欧泊、部分珍珠</b>弱荧光。</li>
+          </ul>
+          <p class="fineprint">荧光不等于放射性；夜光石多数是人造夜光粉，和天然荧光是两回事。</p>
+        </article>
+      </div>
+    </section>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__row">
+    <p class="foot__note">宝谱 · 纯静态标本盘。数据仅供创作参考，不构成鉴定、估值或投资建议；「传说」为民俗与文学材料，不是事实。</p>
+    <span class="foot__credit">Simon Workshop™</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
+  <button class="drawer__close" id="drawerClose" type="button" aria-label="关闭详情">×</button>
+  <div class="drawer__scroll" id="drawerScroll"></div>
+</aside>
+
+<div class="print-sheet" id="printSheet" aria-hidden="true"></div>
+
+<script src="data/gems.js"></script>
+<script src="data/metals.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
