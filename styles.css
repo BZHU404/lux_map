@@ -182,7 +182,7 @@ svg { display: block; }
 
 .tab.is-on { color: var(--ink); }
 
-.tab.is-on::after {
+.tab::after {
   content: "";
   position: absolute;
   left: 0;
@@ -190,7 +190,12 @@ svg { display: block; }
   bottom: 0;
   height: 2px;
   background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .3s var(--ease);
 }
+
+.tab.is-on::after { transform: scaleX(1); }
 
 .search {
   flex: 1 1 auto;
@@ -378,6 +383,8 @@ svg { display: block; }
 }
 
 .mk i {
+  animation: mkIn .34s var(--ease) backwards;
+  animation-delay: var(--d, 0ms);
   display: block;
   width: 9px;
   height: 9px;
@@ -664,6 +671,7 @@ svg { display: block; }
 
 .card {
   position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 15px 16px 13px;
@@ -673,6 +681,21 @@ svg { display: block; }
   transition: border-color .2s, box-shadow .2s, transform .2s var(--ease);
 }
 
+.card::after {
+  content: "";
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: -45%;
+  width: 14%;
+  background: rgba(166, 124, 61, .08);
+  transform: skewX(-16deg);
+  transition: left .7s var(--ease);
+  pointer-events: none;
+}
+
+.card:hover::after { left: 115%; }
+
 .card:hover {
   border-color: var(--gold);
   box-shadow: 0 10px 24px -14px rgba(33, 28, 23, .38);
@@ -681,6 +704,7 @@ svg { display: block; }
 
 .card__art {
   position: absolute;
+  transition: transform .5s var(--ease);
   top: 12px;
   right: 12px;
   width: 56px;
@@ -689,6 +713,8 @@ svg { display: block; }
 }
 
 .card__art svg { width: 100%; height: 100%; }
+
+.card:hover .card__art { transform: rotate(-7deg) scale(1.06); }
 
 .card__kicker {
   display: flex;
@@ -1366,7 +1392,8 @@ svg { display: block; }
   .mohs { padding-top: 24px; }
   .sec-head { margin-bottom: 10px; }
   .sec-head__hint { display: none; }
-  .mohs__plot { height: 54px; }
+  /* 手机端：散点图容易串行，只保留 1–10 的硬度按钮 */
+  .mohs__plot { display: none; }
   .mohs__cell b { font-size: 12.5px; }
   .mohs__cell small { font-size: 7.5px; letter-spacing: 0; }
   .mohs__ref { font-size: 9px; line-height: 1.6; }
@@ -1483,6 +1510,18 @@ body.is-index .search { display: none; }
   color: var(--ink-2);
   text-align: right;
 }
+
+.ledger__note {
+  max-width: 900px;
+  margin: 12px 0 0;
+  padding-left: 10px;
+  font-size: 10.5px;
+  line-height: 1.85;
+  color: var(--ink-2);
+  border-left: 2px solid var(--gold-line);
+}
+
+.ledger__note b { font-weight: 600; color: var(--ink); }
 
 .stats {
   display: grid;
@@ -2424,6 +2463,219 @@ body.is-index .search { display: none; }
   .settings { margin-top: 32px; padding-top: 24px; }
   .settinggrid { grid-template-columns: repeat(2, 1fr); }
 }
+
+
+/* 猛犸象牙专题 */
+
+.featurelink {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 16px;
+  padding: 10px 12px;
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--ink-2);
+  background: var(--gold-wash);
+  border: 1px solid var(--gold-line);
+  transition: border-color .16s;
+}
+
+.featurelink span {
+  padding: 2px 5px;
+  font-size: 8px;
+  letter-spacing: .14em;
+  color: var(--gold-ink);
+  border: 1px solid var(--gold-line);
+}
+
+.featurelink em { margin-left: auto; font-style: normal; color: var(--gold-ink); }
+
+.featurelink:hover { border-color: var(--gold); }
+
+.mammoth { padding-top: 46px; padding-bottom: 80px; }
+
+.mammoth__head { padding-bottom: 30px; border-bottom: 1px solid var(--ink); }
+
+.mammoth__eyebrow { font-size: 9px; letter-spacing: .26em; color: var(--gold-ink); }
+
+.mammoth h1 {
+  margin: 14px 0 16px;
+  font-family: var(--serif);
+  font-size: clamp(38px, 6vw, 62px);
+  font-weight: 600;
+  letter-spacing: .1em;
+  line-height: 1.1;
+}
+
+.mammoth__lede {
+  max-width: 760px;
+  font-family: var(--serif);
+  font-size: 15.5px;
+  line-height: 2.05;
+  color: var(--ink-2);
+}
+
+.mammoth__badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+
+.mammoth__badges span {
+  padding: 5px 11px;
+  font-size: 9.5px;
+  letter-spacing: .08em;
+  color: var(--ink-2);
+  border: 1px solid var(--gold-line);
+}
+
+.mammoth__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 34px;
+  border-top: 1px solid var(--gold-line);
+  border-left: 1px solid var(--gold-line);
+}
+
+.mammoth__card {
+  padding: 24px 26px;
+  border-right: 1px solid var(--gold-line);
+  border-bottom: 1px solid var(--gold-line);
+}
+
+.mammoth__card h2 {
+  margin-bottom: 9px;
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: .08em;
+}
+
+.mammoth__card p { font-size: 12px; line-height: 1.95; color: var(--ink-2); }
+
+.mammoth__sec { margin-top: 46px; padding-top: 30px; border-top: 1px solid var(--ink); }
+
+.mammoth__sec h2 {
+  margin-bottom: 12px;
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: .08em;
+}
+
+.mammoth__sec p { max-width: 760px; font-size: 12.5px; line-height: 2; color: var(--ink-2); }
+
+.mammoth__sec ul { max-width: 760px; padding-left: 18px; }
+
+.mammoth__sec li { margin-bottom: 7px; font-size: 12.5px; line-height: 1.9; color: var(--ink-2); }
+
+.mammoth__sec .mini { margin: 16px 0 10px; }
+
+.mammoth__tablewrap { overflow-x: auto; }
+
+.mammoth__back { margin-top: 44px; }
+
+@media (max-width: 760px) {
+  .mammoth { padding-top: 28px; padding-bottom: 56px; }
+  .mammoth__grid { grid-template-columns: 1fr; border-left: 0; }
+  .mammoth__card { padding: 18px 0; border-right: 0; }
+  .mammoth__lede { font-size: 14px; }
+  .mammoth__sec { margin-top: 32px; padding-top: 22px; }
+  .mammoth__tablewrap .mini { min-width: 520px; }
+}
+
+
+/* ============================== 动效 ============================== */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes brandGlint {
+  0% { left: -8%; opacity: 0; }
+  15% { opacity: .6; }
+  75% { opacity: .6; }
+  100% { left: 108%; opacity: 0; }
+}
+
+@keyframes mkIn {
+  from { transform: rotate(45deg) scale(0); }
+  to { transform: rotate(45deg) scale(1); }
+}
+
+@keyframes floatArt {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes secIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes viewIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+.brand, .masthead__tag { animation: fadeUp .9s var(--ease) backwards; }
+
+.masthead__tag { animation-delay: .2s; }
+
+.brand__cn {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.brand__cn::after {
+  content: "";
+  position: absolute;
+  top: 6%;
+  bottom: 8%;
+  left: -10%;
+  width: 1px;
+  background: var(--gold);
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.is-loaded .brand__cn::after { animation: brandGlint 1.7s .45s var(--ease); }
+
+/* 抽屉：丝绒带掠光、宝石漂浮、分节错峰 */
+
+.band::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: -35%;
+  width: 22%;
+  background: rgba(247, 242, 233, .05);
+  transform: skewX(-14deg);
+  transition: left .95s .12s var(--ease);
+  pointer-events: none;
+}
+
+.drawer.is-open .band::before { left: 112%; }
+
+.drawer.is-open .band__art { animation: floatArt 7s ease-in-out .4s infinite; }
+
+.drawer.is-open .detail__hook { animation: secIn .5s .1s var(--ease) backwards; }
+
+.drawer.is-open .keyfigs { animation: secIn .5s .16s var(--ease) backwards; }
+
+.drawer.is-open .featurelink { animation: secIn .5s .2s var(--ease) backwards; }
+
+.drawer.is-open .detail .sec:nth-of-type(1) { animation: secIn .5s .22s var(--ease) backwards; }
+.drawer.is-open .detail .sec:nth-of-type(2) { animation: secIn .5s .27s var(--ease) backwards; }
+.drawer.is-open .detail .sec:nth-of-type(3) { animation: secIn .5s .32s var(--ease) backwards; }
+.drawer.is-open .detail .sec:nth-of-type(4) { animation: secIn .5s .37s var(--ease) backwards; }
+.drawer.is-open .detail .sec:nth-of-type(5) { animation: secIn .5s .42s var(--ease) backwards; }
+.drawer.is-open .detail .sec:nth-of-type(6) { animation: secIn .5s .47s var(--ease) backwards; }
+
+/* 视图切换 */
+
+.view-in { animation: viewIn .55s var(--ease) both; }
+
 
 /* ============================== 打印：A5 珠宝标签 ============================== */
 

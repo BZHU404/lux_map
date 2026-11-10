@@ -342,6 +342,7 @@
     { id: 'snow', cn: '雪花镶', en: 'Snowflake', desc: '多颗小钻围成雪花，主石在中心。', note: '视觉放大；结构复杂。' }
   ];
 
+
   var HABITS = [
     { id: 'massive', cn: '块状', en: 'Massive', desc: '没有明显晶形，整块产出；多数玉石与雕刻料都是这种。', eg: '翡翠、绿松石、青金石' },
     { id: 'acicular', cn: '针状', en: 'Acicular', desc: '细长如针的晶体，常成束或放射状。', eg: '霓石、钠沸石' },
@@ -852,7 +853,7 @@
     var lanes = [];
     var html = '';
 
-    sortedItems.forEach(function (it) {
+    sortedItems.forEach(function (it, idx) {
       var x = ((midMohs(it) - 0.5) / 10) * 100;
       var lane = -1;
       for (var i = 0; i < lanes.length; i++) {
@@ -862,7 +863,7 @@
       else { lanes[lane] = x; }
 
       var color = (it.colors && it.colors[0] && it.colors[0].hex) || '#A67C3D';
-      html += '<button class="mk" type="button" data-id="' + it.id + '" style="left:' + x.toFixed(2) + '%;bottom:' + (lane * 18) + 'px;--c:' + color + '"' +
+      html += '<button class="mk" type="button" data-id="' + it.id + '" style="left:' + x.toFixed(2) + '%;bottom:' + (lane * 18) + 'px;--c:' + color + ';--d:' + Math.min(idx * 2, 180) + 'ms"' +
         ' aria-label="' + esc(it.name) + '，硬度 ' + fmtMohs(it) + '" title="' + esc(it.name) + ' · ' + fmtMohs(it) + '">' +
         '<i></i><span class="mk__tip">' + esc(it.name) + ' · ' + fmtMohs(it) + '</span></button>';
     });
@@ -928,7 +929,7 @@
     if (isGems) {
       var cats = Object.keys(countBy(items, function (it) { return [it.category]; }));
       html += '<section class="facet"><h3>类别<em>TYPE</em></h3><div class="chips">';
-      ['宝石', '玉石', '有机宝石', '矿石晶体', '人工材料', '法器'].forEach(function (c) {
+      ['宝石', '玉石', '有机宝石', '矿石晶体', '人工材料'].forEach(function (c) {
         if (cats.indexOf(c) > -1) {
           html += '<button class="chip" type="button" data-facet="category" data-val="' + esc(c) + '" aria-pressed="false">' + c + '</button>';
         }
@@ -1123,6 +1124,11 @@
       out += '<div class="keyfig"><b>' + PRICE[it.priceTier].label + '</b><span>价格档 ' + PRICE[it.priceTier].sym + '</span></div>';
     }
     out += '</div>';
+
+    if (it.feature) {
+      out += '<a class="featurelink" href="' + it.feature + '">' +
+        '<span>专题</span>' + esc(it.featureTitle || '阅读专题') + '<em>→</em></a>';
+    }
 
     // 物性
     var spec = '';
@@ -1381,6 +1387,7 @@
   }
 
 
+
   /* ------------------------------- 晶形 ------------------------------- */
 
   function renderHabits() {
@@ -1533,15 +1540,23 @@
     $('#tabHabits').textContent = HABITS.length;
   }
 
+  function animateView(el) {
+    if (!el) return;
+    el.classList.remove('view-in');
+    void el.offsetWidth;
+    el.classList.add('view-in');
+  }
+
   function setView(view) {
     var changed = state.view !== view;
-    var isIndex = view === 'ledger' || view === 'cuts' || view === 'habits';
+    var isIndex = view === 'ledger' || view === 'cuts' || view === 'habits' || view === 'mammoth';
     state.view = view;
 
     document.body.classList.toggle('is-index', isIndex);
     $('#ledger').hidden = view !== 'ledger';
     $('#cuts').hidden = view !== 'cuts';
     $('#habits').hidden = view !== 'habits';
+    $('#mammoth').hidden = view !== 'mammoth';
     $('#toolbarCount').hidden = !isIndex;
 
     if (changed) {
@@ -1554,6 +1569,10 @@
       document.body.classList.remove('filters-open');
       $('#filterBtn').setAttribute('aria-expanded', 'false');
       if (!isIndex) renderRail();
+      if (view === 'ledger') animateView($('#ledger'));
+      else if (view === 'cuts') animateView($('#cuts'));
+      else if (view === 'habits') animateView($('#habits'));
+      else if (view === 'mammoth') animateView($('#mammoth'));
       window.scrollTo(0, 0);
     }
 
@@ -1579,6 +1598,11 @@
       return;
     }
 
+    if (view === 'mammoth') {
+      $('#toolbarCount').textContent = '合法来源 · 猛犸象牙专题';
+      return;
+    }
+
     renderGrid();
     renderRuler();
   }
@@ -1588,9 +1612,9 @@
     if (!raw) { setView('gems'); closeDrawer(false); return; }
 
     var parts = raw.split('/');
-    if (parts[0] === 'gems' || parts[0] === 'metals' || parts[0] === 'ledger' || parts[0] === 'cuts' || parts[0] === 'habits') {
+    if (parts[0] === 'gems' || parts[0] === 'metals' || parts[0] === 'ledger' || parts[0] === 'cuts' || parts[0] === 'habits' || parts[0] === 'mammoth') {
       closeDrawer(false);
-      setView(parts[0] === 'gems' || parts[0] === 'metals' ? parts[0] : parts[0]);
+      setView(parts[0]);
       return;
     }
 
@@ -1871,4 +1895,5 @@
   renderRuler();
   updateConvert();
   route();
+  requestAnimationFrame(function () { document.body.classList.add('is-loaded'); });
 })();
